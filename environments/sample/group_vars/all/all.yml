@@ -1,0 +1,34 @@
+---
+
+# Apt-Select is a package that generate a sources.list based on fatest mirror connection, select true or false
+ubuntu:
+  fastest_apt: true
+
+# Change OS hostname based on hosts.ini file, select true or false
+change_hostname: true
+
+# samba_internal or bind9
+dns_backend: bind9
+
+# DNS for temp resolv.conf and Bind9 DNS Forwarder
+# Resolv.conf it will be changed to fixed Bind9 DNS
+dns:
+  dns1: 8.8.8.8
+  dns2: 8.8.4.4
+
+# Domain which will be provisioned in Samba DC
+# Best practices:
+# Use a domain name you own.
+# Use a subdomain of your domain, such as ad.example.com.
+# Do not use .local domains. They can cause problems with Mac OS X and Zeroconf.
+# https://wiki.samba.org/index.php/Active_Directory_Naming_FAQ
+domain: ad.contoso.domain
+
+# NetBIOS domain name (Workgroup). This can be anything, but it must be one word, not longer than 15 characters and not containing a dot. 
+# It is recommended to use the first part of the AD DNS domain. For example: contoso. Do not use the computers short hostname.
+workgroup: contoso
+
+admin_pass: P@ssword@2021
+
+# Enable Veeam Backup
+veeam_backup: true

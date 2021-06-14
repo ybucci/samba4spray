@@ -1,0 +1,12 @@
+- name: Post-Install | Deploy resolv.conf template
+  template:
+    src: resolv.conf.j2
+    dest: /etc/resolvconf/resolv.conf.d/base
+    owner: root
+    group: root
+    mode: 0644
+    backup: yes
+  notify:
+    - Reload Resolvconf
+    - Apply resolvconf
+  when: '''ID=ubuntu'' in os_release.stdout_lines'

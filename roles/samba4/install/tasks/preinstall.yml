@@ -1,0 +1,66 @@
+- name: Pre-Install | Change Hostname
+  hostname:
+    name="{{ inventory_hostname }}.{{ domain }}"
+  when:
+    ansible_fqdn != ansible_ssh_host and change_hostname is defined
+
+- name: Pre-Install | Check if samba|smbd|nmbd|winbindd is running
+  shell: ps ax | egrep "samba|smbd|nmbd|winbindd" | awk '{print $2}'
+  ignore_errors: yes
+  changed_when: false
+  register: running_processes
+
+- name: Pre-Install | Kill running processes
+  ignore_errors: yes
+  shell: "kill {{ item }}"
+  with_items: "{{ running_processes.stdout_lines }}"
+ 
+- wait_for:
+    path: "/proc/{{ item }}/status"
+    state: absent
+  with_items: "{{ running_processes.stdout_lines }}"
+  ignore_errors: yes
+  register: samba_old_processes
+ 
+- name: Pre-Install | Force kill stuck processes
+  ignore_errors: yes
+  shell: "kill -9 {{ item }}"
+  with_items: "{{ samba_old_processes.results | select('failed') | map(attribute='item') | list }}"
+
+- name: Pre-Install | Hosts - create list from inventory
+  set_fact:
+    etc_hosts_inventory_block: |-
+      {% for item in (groups['all']|default([]))|unique -%}
+      {% if 'access_ip' in hostvars[item] or 'ip' in hostvars[item] or 'ansible_default_ipv4' in hostvars[item] -%}
+      {{ ansible_ssh_host }}      
+      {%- if ('ansible_hostname' in hostvars[item] and item != hostvars[item]['ansible_hostname']) %} {{ hostvars[item]['ansible_hostname'] }}.{{ domain }} {{ hostvars[item]['ansible_hostname'] }}{% endif %} {{ item }}.{{ domain }} {{ item }}
+      {% endif %}
+      {% endfor %}
+  delegate_to: localhost
+  connection: local
+  delegate_facts: yes
+  run_once: yes
+
+- name: Pre-Install | Hosts - populate inventory into hosts file
+  blockinfile:
+    path: /etc/hosts
+    block: "{{ hostvars.localhost.etc_hosts_inventory_block }}"
+    state: present
+    create: yes
+    backup: yes
+    unsafe_writes: yes
+    marker: "# Samba 4 {mark}"
+
+- name: Pre-Install | Update facts
+  setup:
+    gather_subset: min
+
+- name: Pre-Install | Delete old smb.conf
+  file:
+    state: absent
+    path: /etc/samba/smb.conf
+
+- name: Pre-Install | Delete old krb5.conf
+  file:
+    state: absent
+    path: /etc/krb5.conf

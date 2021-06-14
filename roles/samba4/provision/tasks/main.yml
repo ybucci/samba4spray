@@ -1,0 +1,8 @@
+---
+
+- name: Master | Provision Domain
+  include_tasks: provision.yml
+
+# - name: Master | Configure Prerequisites
+#   include_tasks: configuration.yml
+

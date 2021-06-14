@@ -1,0 +1,13 @@
+---
+
+- hosts: all
+  gather_facts: true
+  roles:
+    - { role: bootstrap, tags: init }
+    - { role: samba4/install, tags: install }
+
+- hosts: master
+  gather_facts: true
+  roles:
+    - { role: samba4/provision, tags: provision }
+    - { role: samba4/dns_backend, tags: dns }

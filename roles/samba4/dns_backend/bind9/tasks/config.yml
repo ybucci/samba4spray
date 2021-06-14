@@ -1,0 +1,6 @@
+- name: Bind9 | Disable IPV6 bind9
+  replace:
+    path: /etc/default/bind9
+    after: 'OPTIONS="-u bind -4"'
+    before: 'OPTIONS="-u bind"'
+

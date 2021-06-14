@@ -1,0 +1,8 @@
+---
+- name: Reload Resolvconf
+  service:
+    name: resolvconf.service
+    state: restarted
+
+- name: Apply resolvconf
+  shell: resolvconf -u

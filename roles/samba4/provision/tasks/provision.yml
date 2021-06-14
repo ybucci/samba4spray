@@ -1,0 +1,9 @@
+---
+
+- name: Domain Provision Bind9
+  command: "/usr/local/samba/bin/samba-tool domain provision --realm={{ domain|upper }} --domain={{ workgroup|upper }} --adminpass={{ admin_pass }} --server-role=dc --dns-backend=BIND9_DLZ --use-rfc2307"
+  when: dns_backend == "bind9"
+
+- name: Domain Provision SAMBA_INTERNAL
+  command: "/usr/local/samba/bin/samba-tool domain provision --realm={{ domain|upper }} --domain={{ workgroup|upper }} --adminpass={{ admin_pass }} --server-role=dc --dns-backend=SAMBA_INTERNAL --use-rfc2307"
+  when: dns_backend == "samba_internal"

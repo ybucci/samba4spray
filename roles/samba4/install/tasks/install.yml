@@ -1,0 +1,70 @@
+---
+
+- name: Install | Copy
+  copy:
+    src: samba-{{ samba_version }}.tar.gz
+    dest: /opt/
+
+- name: Install | Extract samba-{{ samba_version }}.tar.gz /opt/
+  unarchive:
+    src: samba-{{ samba_version }}.tar.gz
+    dest: /opt/
+
+- name:  Install | Compiling Samba | ./configure
+  command: chdir=/opt/samba-{{ samba_version }}/ ./configure -j 4 --progress --enable-fhs --sysconfdir=/etc --localstatedir=/var --with-privatedir=/var/lib/samba/private --with-piddir=/var/run/samba --with-automount --datadir=/usr/share --with-lockdir=/var/run/samba --with-statedir=/var/lib/samba --with-cachedir=/var/cache/samba --with-systemd
+  async: 1000
+  poll: 0
+  register: configure
+
+- name: Install | Compiling Samba | Waiting ./configure (Please wait, this will take a while...)
+  async_status:
+    jid: "{{ configure.ansible_job_id }}"
+  register: job_result
+  until: job_result.finished
+  retries: 1000
+  delay: 10
+
+- name: Install | Compiling Samba | make
+  command: chdir=/opt/samba-{{ samba_version }}/ make -j4
+  async: 1000
+  poll: 0
+  register: make
+
+- name: Install | Compiling Samba | Waiting make (Please wait, this will take a while...)
+  async_status:
+    jid: "{{ make.ansible_job_id }}"
+  register: job_result
+  until: job_result.finished
+  retries: 1000
+  delay: 10
+
+- name: Install | Compiling Samba | make install
+  command: chdir=/opt/samba-{{ samba_version }}/ make install
+  async: 1000
+  poll: 0
+  register: make_install
+
+- name: Install | Compiling Samba | Waiting make install (Please wait, this will take a while...)
+  async_status:
+    jid: "{{ make_install.ansible_job_id }}"
+  register: job_result
+  until: job_result.finished
+  retries: 1000
+  delay: 10
+
+- name: Install | Add bin path to /etc/profile
+  blockinfile:
+    dest: /etc/profile
+    content: 'export PATH=/usr/local/samba/bin:$PATH'
+    marker: "# Samba 4 {mark}"
+
+
+# - name: Create Systemctl samba 1/2
+#   template:
+#     src: "{{ item.src }}"
+#     dest: "{{ item.dest }}"
+#   with_items:
+#     - {src: 'samba.service.j2',dest: '/etc/systemd/system/samba.service'}
+
+# - name: Create systemctl samba 2/2
+#   command: systemctl daemon-reload
