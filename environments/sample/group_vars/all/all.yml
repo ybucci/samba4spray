@@ -1,6 +1,6 @@
 ---
 
-# Apt-Select is a package that generate a sources.list based on fatest mirror connection, select true or false
+# Configure a sources.list templates with fatest mirrors.txt
 ubuntu:
   fastest_apt: true
 
@@ -22,7 +22,9 @@ dns:
 # Use a subdomain of your domain, such as ad.example.com.
 # Do not use .local domains. They can cause problems with Mac OS X and Zeroconf.
 # https://wiki.samba.org/index.php/Active_Directory_Naming_FAQ
-domain: ad.contoso.domain
+# https://social.technet.microsoft.com/wiki/contents/articles/34981.active-directory-best-practices-for-internal-domain-and-network-names.aspx
+# https://www.itprotoday.com/active-directory/q-can-i-use-local-or-pvt-top-level-domain-tld-names-part-active-directory-ad-tree
+domain: contoso.invalid
 
 # NetBIOS domain name (Workgroup). This can be anything, but it must be one word, not longer than 15 characters and not containing a dot. 
 # It is recommended to use the first part of the AD DNS domain. For example: contoso. Do not use the computers short hostname.
@@ -30,5 +32,6 @@ workgroup: contoso
 
 admin_pass: P@ssword@2021
 
-# Enable Veeam Backup
+# Enable Veeam Backup 
+# View the documentation: docs/veeam-backup.md //TO_DO
 veeam_backup: true

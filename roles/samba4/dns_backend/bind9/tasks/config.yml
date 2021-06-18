@@ -3,4 +3,3 @@
     path: /etc/default/bind9
     after: 'OPTIONS="-u bind -4"'
     before: 'OPTIONS="-u bind"'
-

@@ -1,47 +1,15 @@
 ---
 
-- name: Ubuntu | Install pip3
+- name: Ubuntu | Add new sources.list with mirrors
+  template:
+    src: sources.list.j2
+    dest: /etc/apt/sources.list
+  when: ubuntu.fastest_apt is defined    
+
+
+- name: Ubuntu | Update apt list
   apt:
-    name: python3-pip
-    state: present
     update_cache: yes
-  when: ubuntu.fastest_apt is defined
-  async: 1000
-  poll: 0
-  register: apt_pip_sleeper
-
-- name: 'Ubuntu | Waiting pip3 installation'
-  async_status:
-    jid: "{{ apt_pip_sleeper.ansible_job_id }}"
-  register: job_result
-  until: job_result.finished
-  retries: 50
-  delay: 10
-  when: ubuntu.fastest_apt is defined
-
-- name: Ubuntu | Install Apt-Select
-  pip:
-    name: apt-select
-  when: ubuntu.fastest_apt is defined
-
-- name: Ubuntu | Remove old generated sources.list on user home folder
-  file:
-    path: /home/{{ ansible_ssh_user }}/sources.list
-    state: absent
-  when: ubuntu.fastest_apt is defined
-  ignore_errors: yes
-
-- name: Ubuntu | Select APT fatest mirror
-  shell: apt-select --country BR
-  when: ubuntu.fastest_apt is defined
-  retries: 5
-  delay: 5
-  register: result
-  until: result.rc == 0
-
-- name: Ubuntu | Set APT fatest mirror
-  shell: cat /home/{{ ansible_ssh_user }}/sources.list > /etc/apt/sources.list
-  when: ubuntu.fastest_apt is defined
 
 - name: Ubuntu | Upgrade all packages to the latest version
   apt:

@@ -1,14 +1,15 @@
 ---
 
-- name: Fetch /etc/os-release
-  raw: cat /etc/os-release
-  register: os_release
-  changed_when: false
-  # This command should always run, even in check mode
-  check_mode: false
+# - name: Print all available facts
+#   ansible.builtin.debug:
+#     var: ansible_facts
+
+- set_fact:
+    distribution: "{{ hostvars[inventory_hostname].ansible_distribution }}"
+    release: "{{ hostvars[inventory_hostname].ansible_distribution_release }}"
 
 - include_tasks: ubuntu.yml
-  when: '''ID=ubuntu'' in os_release.stdout_lines'
+  when: distribution == "Ubuntu" and release == "focal"
 
-- include_tasks: centos.yml
-  when: '''ID=centos'' in os_release.stdout_lines'
+# - include_tasks: centos.yml
+#   when: '''ID=centos'' in os_release.stdout_lines'

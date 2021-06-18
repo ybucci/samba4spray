@@ -1,5 +1,5 @@
 // Managing acls
-acl localhost { 127.0.0.0/8; 192.168.0.0/24; };
+acl localhost { 127.0.0.0/8; {{ (ansible_default_ipv4.network + '/' + ansible_default_ipv4.netmask) | ipaddr('network/prefix') }}; };
 
 options {
       directory "/var/cache/bind";
@@ -30,7 +30,7 @@ options {
 
       //  Add any subnets or hosts you want to allow to use recursive queries
       recursion yes;
-      allow-recursion {  "internals"; };
+      allow-recursion { "internals"; };
 
       // https://wiki.samba.org/index.php/Dns-backend_bind
       // DNS dynamic updates via Kerberos (optional, but recommended)
@@ -40,5 +40,9 @@ options {
       // tkey-gssapi-keytab "/var/lib/samba/private/dns.keytab";
       // From Samba 4.9.0 ( You will need to run samba_dnsupgrade if upgrading your Samba version. ) 
       tkey-gssapi-keytab "/var/lib/samba/bind-dns/dns.keytab";
+     
+     
+      include "/var/lib/samba/bind-dns/named.conf";
+
 
   };
