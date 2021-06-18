@@ -1,12 +1,12 @@
 ---
 
-# - name: Print all available facts
-#   ansible.builtin.debug:
-#     var: ansible_facts
-
 - set_fact:
     distribution: "{{ hostvars[inventory_hostname].ansible_distribution }}"
     release: "{{ hostvars[inventory_hostname].ansible_distribution_release }}"
+
+# - name: Print all available facts
+#   ansible.builtin.debug:
+#     var: ansible_facts
 
 - include_tasks: ubuntu.yml
   when: distribution == "Ubuntu" and release == "focal"
