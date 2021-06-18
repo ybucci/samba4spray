@@ -9,4 +9,4 @@
   notify:
     - Reload Resolvconf
     - Apply resolvconf
-  when: '''ID=ubuntu'' in os_release.stdout_lines'
+  when: distribution == "Ubuntu" and release == "focal"

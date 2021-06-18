@@ -1,6 +1,6 @@
 - name: Pre-Install | Change Hostname
   hostname:
-    name="{{ inventory_hostname }}.{{ domain }}"
+    name: "{{ inventory_hostname }}.{{ samba_domain }}"
   when:
     ansible_fqdn != ansible_ssh_host and change_hostname is defined
 
@@ -33,7 +33,7 @@
       {% for item in (groups['all']|default([]))|unique -%}
       {% if 'access_ip' in hostvars[item] or 'ip' in hostvars[item] or 'ansible_default_ipv4' in hostvars[item] -%}
       {{ ansible_ssh_host }}      
-      {%- if ('ansible_hostname' in hostvars[item] and item != hostvars[item]['ansible_hostname']) %} {{ hostvars[item]['ansible_hostname'] }}.{{ domain }} {{ hostvars[item]['ansible_hostname'] }}{% endif %} {{ item }}.{{ domain }} {{ item }}
+      {%- if ('ansible_hostname' in hostvars[item] and item != hostvars[item]['ansible_hostname']) %} {{ hostvars[item]['ansible_hostname'] }}.{{ samba_domain }} {{ hostvars[item]['ansible_hostname'] }}{% endif %} {{ item }}.{{ samba_domain }} {{ item }}
       {% endif %}
       {% endfor %}
   delegate_to: localhost

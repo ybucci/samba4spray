@@ -6,5 +6,5 @@
 - name: Samba | Install
   include_tasks: install.yml
 
-# - name: Samba | Post-Install
-#   include_tasks: postinstall.yml
+- name: Samba | Post-Install
+  include_tasks: postinstall.yml

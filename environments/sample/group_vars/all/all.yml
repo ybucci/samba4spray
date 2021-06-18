@@ -24,7 +24,8 @@ dns:
 # https://wiki.samba.org/index.php/Active_Directory_Naming_FAQ
 # https://social.technet.microsoft.com/wiki/contents/articles/34981.active-directory-best-practices-for-internal-domain-and-network-names.aspx
 # https://www.itprotoday.com/active-directory/q-can-i-use-local-or-pvt-top-level-domain-tld-names-part-active-directory-ad-tree
-domain: contoso.invalid
+
+samba_domain: contoso.invalid
 
 # NetBIOS domain name (Workgroup). This can be anything, but it must be one word, not longer than 15 characters and not containing a dot. 
 # It is recommended to use the first part of the AD DNS domain. For example: contoso. Do not use the computers short hostname.

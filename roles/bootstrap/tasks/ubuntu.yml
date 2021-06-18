@@ -161,4 +161,3 @@
   systemd:
     name: resolvconf.service
     enabled: yes
-  when: '''ID=ubuntu'' in os_release.stdout_lines'
