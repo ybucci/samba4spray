@@ -1,19 +1,20 @@
-- name: Pre-Install | Change Hostname
+- name: Change Hostname
   hostname:
     name: "{{ inventory_hostname }}.{{ samba_domain }}"
   when:
     ansible_fqdn != ansible_ssh_host and change_hostname is defined
 
-- name: Pre-Install | Check if samba|smbd|nmbd|winbindd is running
+- name: Check if samba|smbd|nmbd|winbindd is running
   shell: ps ax | egrep "samba|smbd|nmbd|winbindd" | awk '{print $2}'
   ignore_errors: yes
   changed_when: false
   register: running_processes
 
-- name: Pre-Install | Kill running processes
+- name: Kill running processes
   ignore_errors: yes
   shell: "kill {{ item }}"
   with_items: "{{ running_processes.stdout_lines }}"
+  when: running_processes.changed
  
 - wait_for:
     path: "/proc/{{ item }}/status"
@@ -21,13 +22,15 @@
   with_items: "{{ running_processes.stdout_lines }}"
   ignore_errors: yes
   register: samba_old_processes
+  when: running_processes.changed
  
-- name: Pre-Install | Force kill stuck processes
+- name: Force kill stuck processes
   ignore_errors: yes
   shell: "kill -9 {{ item }}"
   with_items: "{{ samba_old_processes.results | select('failed') | map(attribute='item') | list }}"
+  when: running_processes.changed
 
-- name: Pre-Install | Hosts - create list from inventory
+- name: Hosts - create list from inventory
   set_fact:
     etc_hosts_inventory_block: |-
       {% for item in (groups['all']|default([]))|unique -%}
@@ -41,7 +44,7 @@
   delegate_facts: yes
   run_once: yes
 
-- name: Pre-Install | Hosts - populate inventory into hosts file
+- name: Hosts - populate inventory into hosts file
   blockinfile:
     path: /etc/hosts
     block: "{{ hostvars.localhost.etc_hosts_inventory_block }}"
@@ -51,16 +54,24 @@
     unsafe_writes: yes
     marker: "# Samba 4 {mark}"
 
-- name: Pre-Install | Update facts
+- name: Update facts
   setup:
     gather_subset: min
 
-- name: Pre-Install | Delete old smb.conf
+- name: Delete old smb.conf
   file:
     state: absent
     path: /etc/samba/smb.conf
 
-- name: Pre-Install | Delete old krb5.conf
+- name: Delete old krb5.conf
   file:
     state: absent
     path: /etc/krb5.conf
+
+- name: Add bin path to /etc/profile
+  blockinfile:
+    dest: /etc/profile
+    content: |
+      export PATH=/usr/local/samba/bin:$PATH
+      export PATH=/usr/local/samba/sbin:$PATH
+    marker: "# Samba 4 {mark}"

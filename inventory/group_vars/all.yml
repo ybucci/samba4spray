@@ -1,58 +1,6 @@
----
-
-# Version of Samba
-# It's already configured to defaults 4.14.5
-# Use this with your own risk
-# samba_version: 4.14.5
-
-# Configure a sources.list templates with fatest mirrors.txt
-ubuntu:
-  fastest_apt: true
-
 # Change OS hostname based on hosts.ini file, select true or false
 change_hostname: true
-
-# samba_internal or bind9
-dns_backend: bind9
-
-# DNS for Bind9 DNS Forwarder
-dns1: 8.8.8.8
-dns2: 8.8.4.4
-
-#Set you timezone
-timezone: America/Sao_Paulo
-
-ntp_servers:
-  - 0.br.pool.ntp.org
-  - 1.br.pool.ntp.org
-  - 2.br.pool.ntp.org
-  - 3.br.pool.ntp.org
-
-# Domain which will be provisioned in Samba DC
-# Best practices:
-# Use a domain name you own.
-# Use a subdomain of your domain, such as ad.example.com.
-# Do not use .local domains. They can cause problems with Mac OS X and Zeroconf.
-# https://wiki.samba.org/index.php/Active_Directory_Naming_FAQ
-# https://social.technet.microsoft.com/wiki/contents/articles/34981.active-directory-best-practices-for-internal-domain-and-network-names.aspx
-# https://www.itprotoday.com/active-directory/q-can-i-use-local-or-pvt-top-level-domain-tld-names-part-active-directory-ad-tree
-samba_domain: contoso.invalid
-
-# NetBIOS domain name (Workgroup). This can be anything, but it must be one word, not longer than 15 characters and not containing a dot. 
-# It is recommended to use the first part of the AD DNS domain. For example: contoso. Do not use the computers short hostname.
-workgroup: contoso
-
-# Password of AD user Administrator
-# Best Pratcies: Strong and complex password containing alphanumeric and special characters
-admin_pass: P@ssword@2021
 
 # Enable Veeam Backup 
 # View the documentation: docs/veeam-backup.md //TO_DO
 veeam_backup: true
-
-# FileServer on DC ?
-# Best Practice: Don't use Samba DC with fileserver, for fileserver create a new server with domain member in hosts.ini file
-# https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller#Using_the_Domain_Controller_as_a_File_Server
-fileserver:
-  dc: true
-  

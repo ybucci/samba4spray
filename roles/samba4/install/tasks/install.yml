@@ -57,9 +57,3 @@
   until: job_result.finished
   retries: 1000
   delay: 10
-
-- name: Add bin path to /etc/profile
-  blockinfile:
-    dest: /etc/profile
-    content: 'export PATH=/usr/local/samba/bin:$PATH'
-    marker: "# Samba 4 {mark}"
