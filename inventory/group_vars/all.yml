@@ -1,3 +1,5 @@
+---
+
 # Change OS hostname based on hosts.ini file, select true or false
 change_hostname: true
 
