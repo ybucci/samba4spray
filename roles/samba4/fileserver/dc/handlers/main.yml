@@ -3,3 +3,15 @@
   service:
     name: samba.service
     state: restarted
+
+- name: Restart Bind
+  service:
+    name: named.service
+    state: restarted
+
+- name: Reload Daemon
+  systemd:
+    daemon_reload: yes
+
+- name: Reload ldconfig
+  shell: ldconfig

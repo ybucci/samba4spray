@@ -6,3 +6,30 @@
     - {src: 'smb.conf.j2', dest: '/etc/samba/smb.conf'}
   notify:
     - Restart Samba
+
+- name: Winbind Create a symbolic link
+  shell: |
+    ln -s /usr/local/samba/lib/libnss_winbind.so.2 /lib/x86_64-linux-gnu/
+    ln -s /lib/x86_64-linux-gnu/libnss_winbind.so.2 /lib/x86_64-linux-gnu/libnss_winbind.so
+  notify: 
+    - Reload ldconfig
+  ignore_errors: true
+
+- name: Enable winbind in nsswitch.conf
+  lineinfile:
+    path: /etc/nsswitch.conf
+    regexp: '^passwd(.*)$'
+    line: 'passwd:         files systemd winbind'
+    backrefs: yes
+
+- name: Enable winbind in nsswitch.conf
+  lineinfile:
+    path: /etc/nsswitch.conf
+    regexp: '^group(.*)$'
+    line: 'group:          files systemd winbind'
+    backrefs: yes
+  notify: 
+    - Reload Daemon
+    - Reload ldconfig
+    - Restart Samba
+    - Restart Bind
