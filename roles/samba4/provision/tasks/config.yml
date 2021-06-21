@@ -1,12 +1,13 @@
 ---
 
 - name: Configure krb5.conf
-  copy:
-    src: /var/lib/samba/private/krb5.conf
-    dest: /etc/krb5.conf
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
     owner: root
     group: bind
-    remote_src: yes
+  with_items:
+    - {src: 'krb5.conf.j2', dest: '/etc/krb5.conf'}
 
 - name: Create dir ntp_sign
   file:

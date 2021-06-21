@@ -1,16 +1,20 @@
 ---
 
+# Configure a sources.list templates with fatest mirrors.txt
+ubuntu:
+  fastest_apt: true
+
+# Version of Samba
+# It's already configured to defaults 4.14.5
+# Use this with your own risk
+# samba_version: 4.14.5
+
 # Change OS hostname based on hosts.ini file, select true or false
 change_hostname: true
 
 # Enable Veeam Backup 
 # View the documentation: docs/veeam-backup.md //TO_DO
 veeam_backup: true
-
-# Version of Samba
-# It's already configured to defaults 4.14.5
-# Use this with your own risk
-# samba_version: 4.14.5
 
 # Domain which will be provisioned in Samba DC
 # Best practices:
@@ -51,7 +55,3 @@ ntp_servers:
 # https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller#Using_the_Domain_Controller_as_a_File_Server
 fileserver:
   dc: true
-  
-# Configure a sources.list templates with fatest mirrors.txt
-ubuntu:
-  fastest_apt: true
