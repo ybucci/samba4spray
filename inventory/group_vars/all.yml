@@ -1,8 +1,0 @@
----
-
-# Change OS hostname based on hosts.ini file, select true or false
-change_hostname: true
-
-# Enable Veeam Backup 
-# View the documentation: docs/veeam-backup.md //TO_DO
-veeam_backup: true

@@ -1,5 +1,12 @@
 ---
 
+# Change OS hostname based on hosts.ini file, select true or false
+change_hostname: true
+
+# Enable Veeam Backup 
+# View the documentation: docs/veeam-backup.md //TO_DO
+veeam_backup: true
+
 # Version of Samba
 # It's already configured to defaults 4.14.5
 # Use this with your own risk
@@ -45,3 +52,6 @@ ntp_servers:
 fileserver:
   dc: true
   
+# Configure a sources.list templates with fatest mirrors.txt
+ubuntu:
+  fastest_apt: true
