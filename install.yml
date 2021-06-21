@@ -1,13 +1,29 @@
 ---
 
 - hosts: all
-  gather_facts: true
+  gather_facts: yes
+  vars:
+    distribution: "{{ hostvars[inventory_hostname].ansible_distribution }}"
+    release: "{{ hostvars[inventory_hostname].ansible_distribution_release }}"
   roles:
     - { role: bootstrap, tags: init }
+
+- hosts: masters
+  gather_facts: false
+  roles:
     - { role: samba4/install, tags: install }
 
-- hosts: master
-  gather_facts: true
+- hosts: masters
+  gather_facts: false
   roles:
     - { role: samba4/provision, tags: provision }
-    - { role: samba4/dns_backend, tags: dns }
+
+- hosts: masters
+  gather_facts: false
+  roles:
+    - { role: samba4/dns_backend/bind9/masters, tags: dns }
+
+- hosts: masters
+  gather_facts: false
+  roles:
+    - { role: samba4/fileserver/dc, tags: fileserver }

@@ -1,5 +1,5 @@
 // Managing acls
-acl localhost { 127.0.0.0/8; {{ (ansible_default_ipv4.network + '/' + ansible_default_ipv4.netmask) | ipaddr('network/prefix') }}; };
+acl localhost { 127.0.0.0/8; {{ network }}; };
 
 options {
       directory "/var/cache/bind";

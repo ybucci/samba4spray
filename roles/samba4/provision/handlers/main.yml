@@ -1,10 +1,19 @@
 ---
-- name: Restart NTP
+- name: Restart NTP Chrony
   service:
-    name: ntp.service
+    name: chrony.service
     state: restarted
 
-- name: Restart NTP
-  service:
-    name: ntp.service
-    state: enabled
+- name: Enable NTP Chrony
+  systemd:
+    name: chrony.service
+    enabled: yes
+
+- name: Reload Daemon
+  systemd:
+    daemon_reload: yes
+
+- name: Enable Samba Service
+  systemd:
+    name: samba.service
+    enabled: yes

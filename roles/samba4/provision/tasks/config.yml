@@ -16,33 +16,32 @@
     owner: root
     group: bind
 
-- name: Remove ntp
-  apt:
-    pkg: ntp
-    state: absent
+- name: Set timezone
+  timezone:
+    name: "{{ timezone }}"
 
-- name: Enable Timesync and ensure it is not masked
-  systemd:
-    name: systemd-timesyncd.service
-    enabled: yes
-    masked: no
+- name: Disable Chrony IPV6
+  lineinfile:
+    path: /lib/systemd/system/chrony.service
+    regexp: '^ExecStart(.*)$'
+    line: 'ExecStart=/usr/lib/systemd/scripts/chronyd-starter.sh $DAEMON_OPTS -4'
+    backrefs: yes
 
-- name: Start TimeSync
-  systemd:
-    name: systemd-timesyncd.service
-    state: started
-    enabled: yes
-
-- name: Install ntp
-  apt:
-    pkg: ntp
-    state: present
-
-- name: Apply template ntp.conf
+- name: Apply template chrony.conf
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
   with_items:
-    - {src: 'ntp.conf.j2', dest: '/etc/ntp.conf'}
+    - {src: 'chrony.conf.j2', dest: '/etc/chrony/chrony.conf'}
   notify:
-    - Restart NTPt
+    - Restart NTP Chrony
+    - Enable NTP Chrony
+
+- name: Create Samba Systemd
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - {src: 'samba.service.j2', dest: '/etc/systemd/system/samba.service'}
+  notify:
+    - Reload Daemon

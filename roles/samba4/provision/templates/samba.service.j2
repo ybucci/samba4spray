@@ -5,9 +5,9 @@ After=network.target remote-fs.target nss-lookup.target
 [Service]
 Type=forking
 LimitNOFILE=16384
-ExecStart=/usr/sbin/samba -D
+ExecStart=/usr/local/samba/sbin/samba -D
 ExecReload=/usr/bin/kill -HUP $MAINPID
-PIDFile=/run/samba/samba.pid
+PIDFile=/var/run/samba/samba.pid
 
 [Install]
 WantedBy=multi-user.target
