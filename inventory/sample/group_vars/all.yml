@@ -55,3 +55,13 @@ ntp_servers:
 # https://wiki.samba.org/index.php/Setting_up_Samba_as_an_Active_Directory_Domain_Controller#Using_the_Domain_Controller_as_a_File_Server
 fileserver:
   dc: true
+  files_dir: /Servidor
+  home_user_dir: true
+  public_dir: true
+  recycle: true
+
+# Enable Audit
+audit:
+  enable: true
+  max_log_size: 10000
+  

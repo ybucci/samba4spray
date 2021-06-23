@@ -27,3 +27,8 @@
   gather_facts: false
   roles:
     - { role: samba4/fileserver/dc, tags: fileserver }
+
+- hosts: masters
+  gather_facts: false
+  roles:
+    - { role: samba4/configuration, tags: configs }

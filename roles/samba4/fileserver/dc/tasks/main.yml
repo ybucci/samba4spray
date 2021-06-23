@@ -5,3 +5,7 @@
 - name: File Server | Config
   include_tasks: config.yml
   when: fileserver.dc is defined
+
+- name: File Server | Config
+  include_tasks: create_dirs.yml
+  when: fileserver.dc is defined
