@@ -21,6 +21,14 @@
     regexp: '^passwd(.*)$'
     line: 'passwd:         files systemd winbind'
     backrefs: yes
+  notify: 
+    - Reload Daemon
+    - Reload ldconfig
+    - Start Samba
+    - Restart Bind
+  changed_when: true
+
+- meta: flush_handlers
 
 - name: Enable winbind in nsswitch.conf
   lineinfile:
@@ -28,8 +36,11 @@
     regexp: '^group(.*)$'
     line: 'group:          files systemd winbind'
     backrefs: yes
-  notify: 
-    - Reload Daemon
-    - Reload ldconfig
-    - Restart Samba
-    - Restart Bind
+
+- name: Set Domain Admins DiskOperator
+  shell: 'echo "{{ admin_pass }}" | /usr/local/samba/bin/net rpc rights grant "{{ workgroup|upper }}\Domain Admins" SeDiskOperatorPrivilege -U "{{ workgroup|upper }}\administrator"'
+
+
+# -  debug: msg="trigger nginx-restart"
+#    notify: "Start Samba"
+#    

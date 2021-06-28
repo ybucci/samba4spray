@@ -1,0 +1,4 @@
+- name: Restart Syslog
+  service:
+    name: syslog.service
+    state: restarted

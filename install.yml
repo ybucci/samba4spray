@@ -8,10 +8,10 @@
   roles:
     - { role: bootstrap, tags: init }
 
-- hosts: masters
-  gather_facts: false
-  roles:
-    - { role: samba4/install, tags: install }
+# - hosts: masters
+#   gather_facts: false
+#   roles:
+#     - { role: samba4/install, tags: install }
 
 - hosts: masters
   gather_facts: false
@@ -32,3 +32,9 @@
   gather_facts: false
   roles:
     - { role: samba4/configuration, tags: configs }
+
+
+- hosts: masters
+  gather_facts: false
+  roles:
+    - { role: samba4/audit, tags: audit }

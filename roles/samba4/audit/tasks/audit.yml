@@ -1,0 +1,33 @@
+- name: Get Syslog userid
+  shell: id -u syslog
+  register: id_syslog
+
+- name: Add User Unix Syslog to AD
+  shell: "/usr/local/samba/bin/samba-tool user add --random-password --uid-number={{ id_syslog.stdout }} syslog"
+  ignore_errors: true
+
+- name: Create Audit Directory
+  file:
+    path: "{{ fileserver.files_dir }}/Audit"
+    state: directory
+    group: "Domain Admins"
+  when: audit.enable is defined
+
+- name: Create SysLog Audit
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - {src: 'acls.sh.j2', dest: '/tmp/acls.sh'}
+
+- name: Set Permission Audit
+  shell: sh /tmp/acls.sh
+
+- name: Create SysLog Audit
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - {src: '00-samba-audit.conf.j2', dest: '/etc/rsyslog.d/00-samba-audit.conf'}
+  notify:
+    - Restart Syslog

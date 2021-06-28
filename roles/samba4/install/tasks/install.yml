@@ -4,6 +4,10 @@
 #   copy:
 #     src: samba-{{ samba_version }}.tar.gz
 #     dest: /opt/
+- name: Remove old dir of unarchived samba
+  file:
+    path: "/opt/samba-{{ samba_version }}/"
+    state: absent
 
 - name: Download Samba4
   get_url:
@@ -17,21 +21,10 @@
     remote_src: true
 
 - name:  Compiling Samba | ./configure
-  command: chdir=/opt/samba-{{ samba_version }}/ ./configure -j 4 --progress --enable-fhs --sysconfdir=/etc --localstatedir=/var --with-privatedir=/var/lib/samba/private --with-piddir=/var/run/samba --with-automount --datadir=/usr/share --with-lockdir=/var/run/samba --with-statedir=/var/lib/samba --with-cachedir=/var/cache/samba --with-systemd
-  async: 1000
-  poll: 0
-  register: configure
-
-- name: Compiling Samba | Waiting ./configure (Please wait, this will take a while...)
-  async_status:
-    jid: "{{ configure.ansible_job_id }}"
-  register: job_result
-  until: job_result.finished
-  retries: 1000
-  delay: 10
+  command: chdir=/opt/samba-{{ samba_version }}/ ./configure --progress --enable-fhs --sysconfdir=/etc --localstatedir=/var --with-privatedir=/var/lib/samba/private --with-piddir=/var/run/samba --with-automount --datadir=/usr/share --with-lockdir=/var/run/samba --with-statedir=/var/lib/samba --with-cachedir=/var/cache/samba --with-systemd
 
 - name: Compiling Samba | make
-  command: chdir=/opt/samba-{{ samba_version }}/ make -j4
+  command: chdir=/opt/samba-{{ samba_version }}/ make
   async: 1000
   poll: 0
   register: make

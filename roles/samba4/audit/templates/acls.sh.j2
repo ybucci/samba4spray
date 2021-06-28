@@ -1,0 +1,2 @@
+#!/bin/bash
+echo "P@ssword@2021" | /usr/local/samba/bin/smbcacls //{{ inventory_hostname }}/Audit / -U "{{ workgroup|upper }}\\Administrator" --add ACL:"{{ workgroup|upper }}\\syslog:ALLOWED/OI|CI/CHANGE"
