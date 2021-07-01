@@ -20,6 +20,21 @@
     dest: /opt/
     remote_src: true
 
+- name: Copy fix patch Backup Offline 
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - {src: 'domain-offline-backup.patch.j2', dest: '/opt/samba-{{ samba_version }}/domain-offline-backup.patch'}
+  when: samba_version == "4.14.5"
+
+- name: Apply fix patch Backup Offline 
+  patch:
+    src: "/opt/samba-{{ samba_version }}/domain-offline-backup.patch"
+    basedir: "/opt/samba-{{ samba_version }}"
+    strip: 1
+  when: samba_version == "4.14.5"
+
 - name:  Compiling Samba | ./configure
   command: chdir=/opt/samba-{{ samba_version }}/ ./configure --progress --enable-fhs --sysconfdir=/etc --localstatedir=/var --with-privatedir=/var/lib/samba/private --with-piddir=/var/run/samba --with-automount --datadir=/usr/share --with-lockdir=/var/run/samba --with-statedir=/var/lib/samba --with-cachedir=/var/cache/samba --with-systemd
 

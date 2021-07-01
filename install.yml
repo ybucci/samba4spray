@@ -33,7 +33,6 @@
   roles:
     - { role: samba4/configuration, tags: configs }
 
-
 - hosts: masters
   gather_facts: false
   roles:

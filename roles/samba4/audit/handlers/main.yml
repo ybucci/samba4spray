@@ -2,3 +2,8 @@
   service:
     name: syslog.service
     state: restarted
+
+- name: Start Samba
+  service:
+    name: samba.service
+    state: started

@@ -8,25 +8,33 @@ netbios name = {{ inventory_hostname|upper }}
 realm = {{ samba_domain|upper }}
 server role = active directory domain controller
 server services = s3fs, rpc, nbt, wrepl, ldap, cldap, kdc, drepl, winbindd, ntp_signd, kcc, dnsupdate
-workgroup = {{ workgroup }}
+workgroup = {{ workgroup|upper }}
 idmap_ldb:use rfc2307 = yes
 vfs objects = dfs_samba4 acl_xattr {% if audit.enable %}full_audit {% endif %}{% if fileserver.recycle %}recycle{% endif %}
 
 {% if audit.enable %}
 ################# Audit ##########################
 
-log file = {{ fileserver.files_dir }}/Audit/audit.txt
 max log size = {{ audit.max_log_size }}
 strict sync = yes
 sync always = yes
-full_audit:sucess  = mkdir, rmdir, read, pread, write, pwrite, rename, unlink, chmod, chown, open, opendir
-full_audit:prefix = %u|%I|%m|%p|%P|%S
+full_audit:success = unlinkat, renameat
+full_audit:prefix = USER: %U | MACHINE: %M | DIRECTORY: %S 
 full_audit:failure = none
-full_audit:facility = local5
+full_audit:facility = LOCAL5
 full_audit:priority = notice
 
 {% endif %}
+{% if fileserver.recycle %}
+################# Recycle #######################
 
+recycle:keeptree = yes
+recycle:versions = yes
+recycle:repository = {{ fileserver.files_dir }}/Recycle/%U
+recycle:exclude = *.tmp, *.log, *.obj, ~*.*, *.bak
+recycle:exclude_dir = tmp, cache, profiles
+
+{% endif %}
 ################# Default Shares ##################
 # Do not modify!!! unless you know what you're doing
 
@@ -34,12 +42,28 @@ full_audit:priority = notice
 path = /var/lib/samba/sysvol
 read only = No
 
-
 [netlogon]
 path = /var/lib/samba/sysvol/{{ samba_domain }}/scripts
 read only = No
 
+{% if audit.enable %}
+################# Audit ###################
 
+[Audit]
+path = {{ fileserver.files_dir }}/Audit
+read only = no
+browseable = yes
+
+{% endif %}
+{% if fileserver.recycle %}
+################# Recycle ###################
+
+[Recycle]
+path = {{ fileserver.files_dir }}/Recycle
+read only = no
+browseable = no
+
+{% endif %}
 ################# Custom Shares ###################
 
 ### Example share ###
@@ -59,13 +83,6 @@ read only = no
 [Users]
 path = {{ fileserver.files_dir }}/Users
 read only = no
-{% endif %}
-
-{% if fileserver.recycle %}
-[Recycle]
-path = {{ fileserver.files_dir }}/Recycle
-read only = no
-browseable = no
 {% endif %}
 
 
