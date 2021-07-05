@@ -1,5 +1,4 @@
 ---
-
 - name: Add new sources.list with mirrors
   template:
     src: sources.list.j2
@@ -15,17 +14,6 @@
     name: "*"
     state: latest
     update_cache: yes
-  async: 1000
-  poll: 0
-  register: apt_sleeper
-
-- name: 'Waiting Upgrade All Packages'
-  async_status:
-    jid: "{{ apt_sleeper.ansible_job_id }}"
-  register: job_result
-  until: job_result.finished
-  retries: 100
-  delay: 10
 
 - name: Install Required Packages
   apt:
@@ -129,19 +117,10 @@
       - traceroute
       - unzip
       - chrony
+      - sshpass
+      - glusterfs-server
     state: present
     update_cache: yes
-  async: 1000
-  poll: 0
-  register: apt_sleeper
-
-- name: 'Waiting Install all Packages'
-  async_status:
-    jid: "{{ apt_sleeper.ansible_job_id }}"
-  register: job_result
-  until: job_result.finished
-  retries: 100
-  delay: 10
 
 - name: Install Bind9
   apt:

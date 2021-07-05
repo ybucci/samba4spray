@@ -1,6 +1,4 @@
 ---
-
-
 - name: Check if already exists an domain
   stat:
     path: /var/lib/samba/private/idmap.ldb

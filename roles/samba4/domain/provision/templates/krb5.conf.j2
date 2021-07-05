@@ -6,8 +6,8 @@
 [realms]
 {{ samba_domain|upper }} = {
         default_domain = {{ samba_domain }}
-        kdc = {{ ansible_ssh_host }}
-        admin_server = {{ ansible_ssh_host }}
+        kdc = {{ ansible_host }}
+        admin_server = {{ ansible_host }}
 }
 
 [domain_realm]

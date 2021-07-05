@@ -1,0 +1,27 @@
+
+
+- name: Create Backup of Idmap
+  command: /usr/local/samba/bin/tdbbackup -s .bak /var/lib/samba/private/idmap.ldb
+  when: inventory_hostname in groups['masters']
+
+- name: Copy idpmap to DCs
+  synchronize: src=/var/lib/samba/private/idmap.ldb.bak dest=/var/lib/samba/private/idmap.ldb
+  delegate_to: '{{ groups.masters[0] }}'
+
+- name: Flush Net Cache
+  command: /usr/local/samba/bin/net cache flush
+
+- name: Enable and start service Bind9
+  systemd:
+    name: bind9
+    enabled: yes
+    state: started
+  when: inventory_hostname in groups['dc']
+
+- name: Apply new resolv.conf
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ item.dest }}"
+  with_items:
+    - {src: 'resolv.conf.j2', dest: '/etc/resolv.conf'}
+  when: inventory_hostname in groups['dc']

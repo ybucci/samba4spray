@@ -1,9 +1,5 @@
 ---
 
-# - name: Copy
-#   copy:
-#     src: samba-{{ samba_version }}.tar.gz
-#     dest: /opt/
 - name: Remove old dir of unarchived samba
   file:
     path: "/opt/samba-{{ samba_version }}/"
@@ -33,35 +29,20 @@
     src: "/opt/samba-{{ samba_version }}/domain-offline-backup.patch"
     basedir: "/opt/samba-{{ samba_version }}"
     strip: 1
+    remote_src: yes
   when: samba_version == "4.14.5"
 
 - name:  Compiling Samba | ./configure
-  command: chdir=/opt/samba-{{ samba_version }}/ ./configure --progress --enable-fhs --sysconfdir=/etc --localstatedir=/var --with-privatedir=/var/lib/samba/private --with-piddir=/var/run/samba --with-automount --datadir=/usr/share --with-lockdir=/var/run/samba --with-statedir=/var/lib/samba --with-cachedir=/var/cache/samba --with-systemd
-
-- name: Compiling Samba | make
-  command: chdir=/opt/samba-{{ samba_version }}/ make
-  async: 1000
-  poll: 0
-  register: make
+  shell: ./configure --progress --enable-fhs --sysconfdir=/etc --localstatedir=/var --with-privatedir=/var/lib/samba/private --with-piddir=/var/run/samba --with-automount --datadir=/usr/share --with-lockdir=/var/run/samba --with-statedir=/var/lib/samba --with-cachedir=/var/cache/samba --with-systemd >> configure.log
+  args:
+    chdir: /opt/samba-{{ samba_version }}/
 
 - name: Compiling Samba | make (Please wait, this will take a while...)
-  async_status:
-    jid: "{{ make.ansible_job_id }}"
-  register: job_result
-  until: job_result.finished
-  retries: 1000
-  delay: 10
-
-- name: Compiling Samba | make install
-  command: chdir=/opt/samba-{{ samba_version }}/ make install
-  async: 1000
-  poll: 0
-  register: make_install
+  shell: make >> make.log
+  args:
+    chdir: /opt/samba-{{ samba_version }}/
 
 - name: Compiling Samba | make install (Please wait, this will take a while...)
-  async_status:
-    jid: "{{ make_install.ansible_job_id }}"
-  register: job_result
-  until: job_result.finished
-  retries: 1000
-  delay: 10
+  shell: make install >> make_install.log
+  args:
+    chdir: /opt/samba-{{ samba_version }}/

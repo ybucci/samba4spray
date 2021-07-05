@@ -1,15 +1,19 @@
 ---
 
-
 - name: Set facts
-  include_tasks: ../../../facts.yml
+  include_tasks: ../../../../facts.yml
 
 - set_fact:
     distribution: "{{ hostvars[inventory_hostname].ansible_distribution }}"
     release: "{{ hostvars[inventory_hostname].ansible_distribution_release }}"
 
-- name: Samba | Provision
-  include_tasks: provision.yml
-
 - name: Samba | Configure
   include_tasks: config.yml
+  when: inventory_hostname in groups['dc']
+
+- name: Samba | Join
+  include_tasks: join.yml
+  when: inventory_hostname in groups['dc']
+
+- name: Samba | Post Join
+  include_tasks: post_join.yml

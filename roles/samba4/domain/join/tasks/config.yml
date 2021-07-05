@@ -38,11 +38,9 @@
     - Restart NTP Chrony
     - Enable NTP Chrony
 
-- name: Create Samba Systemd
-  template:
-    src: "{{ item.src }}"
-    dest: "{{ item.dest }}"
-  with_items:
-    - {src: 'samba.service.j2', dest: '/etc/systemd/system/samba.service'}
-  notify:
-    - Reload Daemon
+- name: Close all Kerberos Ticket
+  shell: kdestroy
+  ignore_errors: true
+
+- name: Get Ticket Kerberos
+  shell: 'echo "{{ admin_pass }}" | kinit administrator'

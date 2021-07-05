@@ -10,4 +10,4 @@
   with_items:
     - "{{ ansible_interfaces }}"
   vars:
-    target_address: "{{ ansible_ssh_host }}"
+    target_address: "{{ ansible_host }}"  

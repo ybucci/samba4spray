@@ -1,39 +1,64 @@
 ---
-
 - hosts: all
   gather_facts: yes
   vars:
     distribution: "{{ hostvars[inventory_hostname].ansible_distribution }}"
     release: "{{ hostvars[inventory_hostname].ansible_distribution_release }}"
   roles:
-    - { role: bootstrap, tags: init }
+    - { role: bootstrap, tags: [ 'init', 'install' ] }
+
+- hosts: masters:dc
+  gather_facts: false
+  roles:
+    - { role: samba4/install, tags: [ 'install' ] }
+
+- hosts: masters
+  gather_facts: false
+  roles:
+    - { role: samba4/domain/provision, tags: [ 'provision' ] }
+
+- hosts: masters:dc
+  gather_facts: yes
+  roles:
+    - { role: samba4/dns_backend/bind9, tags: [ 'dns' ] }
+    - { role: samba4/domain/join, tags: [ 'join' ] }
+
+- hosts: all
+  gather_facts: no
+  tasks:
+    - name: Enable and start service Gluster
+      systemd:
+        name: glusterd.service
+        enabled: yes
+        state: started
+      when: sysvol_replication is defined
+
+- hosts: masters
+  gather_facts: false
+  roles:
+    - { role: samba4/domain/sysvol, tags: [ 'sysvol' ], when: sysvol_replication is defined }
+
 
 # - hosts: masters
 #   gather_facts: false
 #   roles:
-#     - { role: samba4/install, tags: install }
+#     - { role: samba4/fileserver/dc, tags: fileserver }
 
-- hosts: masters
-  gather_facts: false
-  roles:
-    - { role: samba4/provision, tags: provision }
+# - hosts: masters
+#   gather_facts: false
+#   roles:
+#     - { role: samba4/configuration, tags: configs }
 
-- hosts: masters
-  gather_facts: false
-  roles:
-    - { role: samba4/dns_backend/bind9/masters, tags: dns }
+# - hosts: masters
+#   gather_facts: false
+#   roles:
+#     - { role: samba4/audit, tags: audit }
 
-- hosts: masters
-  gather_facts: false
-  roles:
-    - { role: samba4/fileserver/dc, tags: fileserver }
 
-- hosts: masters
-  gather_facts: false
-  roles:
-    - { role: samba4/configuration, tags: configs }
 
-- hosts: masters
-  gather_facts: false
-  roles:
-    - { role: samba4/audit, tags: audit }
+
+
+# # - hosts: dc
+# #   gather_facts: false
+# #   roles:
+# #     - { role: samba4/dns_backend/bind9/dc, tags: dns }

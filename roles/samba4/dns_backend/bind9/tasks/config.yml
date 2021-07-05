@@ -20,7 +20,7 @@
   template:
     src: resolv.conf.j2
     dest: /etc/resolv.conf
-  
+
 - name: Apply named.conf.options template
   template:
     src: named.conf.options.j2
@@ -30,12 +30,6 @@
   template:
     src: named.conf.local.j2
     dest: /etc/bind/named.conf.local
-
-- name: Enable and start service Bind9
-  systemd:
-    name: bind9
-    enabled: yes
-    state: started
 
 - name: Disable IPV6 on Sysctl
   sysctl:
@@ -52,3 +46,10 @@
     sysctl_set: yes
     state: present
     reload: yes
+
+- name: Enable and start service Bind9
+  systemd:
+    name: bind9
+    enabled: yes
+    state: restarted
+  when: inventory_hostname in groups['masters']

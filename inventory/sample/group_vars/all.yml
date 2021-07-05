@@ -66,4 +66,5 @@ audit:
   enable: true
   max_log_size: 10000
   log_retention: 7
-  
+
+sysvol_replication: true

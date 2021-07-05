@@ -1,0 +1,12 @@
+{% if inventory_hostname in groups['dc'] %}
+{% for host in groups['masters'] %}
+search {{ samba_domain }}
+nameserver {{ hostvars[host].ansible_host }}
+{% endfor %}
+{% else %}
+search {{ samba_domain }}
+nameserver {{ ansible_host }}
+{% for host in groups['dc'] %}
+nameserver {{ hostvars[host].ansible_host }}
+{% endfor %}
+{% endif %}

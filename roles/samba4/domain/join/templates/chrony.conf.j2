@@ -37,5 +37,5 @@ server {{ ntp }} iburst
 
 ntpsigndsocket  /usr/local/samba/var/lib/ntp_signd
 
-bindcmdaddress {{ ansible_ssh_host }}
+bindcmdaddress {{ ansible_host }}
 allow {{ network }}

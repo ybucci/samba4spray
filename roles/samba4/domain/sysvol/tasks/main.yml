@@ -1,0 +1,2 @@
+- name: Samba | Sysvol Replication
+  include_tasks: gluster.yml
