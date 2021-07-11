@@ -1,5 +1,21 @@
 ---
 
+- name: Disable IPV6 on Sysctl
+  sysctl:
+    name: net.ipv6.conf.all.disable_ipv6
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
+- name: Disable IPV6 on Sysctl
+  sysctl:
+    name: net.ipv6.conf.default.disable_ipv6
+    value: '1'
+    sysctl_set: yes
+    state: present
+    reload: yes
+
 - name: Configure krb5.conf
   template:
     src: "{{ item.src }}"
@@ -15,28 +31,30 @@
     state: directory
     mode: '0750'
     owner: root
-    group: bind
+    group: ntp
+  when: inventory_hostname not in groups['fileserver']
 
 - name: Set timezone
   timezone:
     name: "{{ timezone }}"
 
-- name: Disable Chrony IPV6
-  lineinfile:
-    path: /lib/systemd/system/chrony.service
-    regexp: '^ExecStart(.*)$'
-    line: 'ExecStart=/usr/lib/systemd/scripts/chronyd-starter.sh $DAEMON_OPTS -4'
-    backrefs: yes
+- name: Disable
+  systemd:
+    name: systemd-resolved
+    enabled: no
+    state: stopped
 
-- name: Apply template chrony.conf
+- name: Remove old resolv.conf
+  file:
+    path: /etc/resolv.conf
+    state: absent
+
+- name: Apply new resolv.conf
   template:
     src: "{{ item.src }}"
     dest: "{{ item.dest }}"
   with_items:
-    - {src: 'chrony.conf.j2', dest: '/etc/chrony/chrony.conf'}
-  notify:
-    - Restart NTP Chrony
-    - Enable NTP Chrony
+    - {src: 'resolv.conf.j2', dest: '/etc/resolv.conf'}
 
 - name: Close all Kerberos Ticket
   shell: kdestroy

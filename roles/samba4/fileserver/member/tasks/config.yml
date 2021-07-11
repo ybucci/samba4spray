@@ -26,26 +26,9 @@
   systemd:
     daemon_reload: yes
 
-- name: Restart Bind
-  systemd:
-    name: named.service
-    state: restarted
-
-- name: Restart Samba
-  systemd:
-    name: samba.service
-    state: restarted
-
 - name: Enable winbind in nsswitch.conf
   lineinfile:
     path: /etc/nsswitch.conf
     regexp: '^group(.*)$'
     line: 'group:          files systemd winbind'
     backrefs: yes
-
-- name: Set Domain Admins DiskOperator
-  shell: 'echo "{{ admin_pass }}" | /usr/local/samba/bin/net rpc rights grant "{{ workgroup|upper }}\Domain Admins" SeDiskOperatorPrivilege -U "{{ workgroup|upper }}\administrator"'
-  retries: 3
-  delay: 3
-  register: result
-  until: result.rc == 0  

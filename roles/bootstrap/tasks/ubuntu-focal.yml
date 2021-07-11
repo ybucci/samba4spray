@@ -116,7 +116,7 @@
       - net-tools
       - traceroute
       - unzip
-      - chrony
+      - ntp
       - sshpass
       - glusterfs-server
     state: present
@@ -140,6 +140,14 @@
     enabled: no
     state: stopped
   register: disabled
+
+- name: Disable AppArmor
+  shell: aa-teardown
+
+- name: Disable krb5-kdc service
+  systemd:
+    name: krb5-kdc.service
+    enabled: no  
 
 - name: Reboot host and wait for it to restart
   reboot:

@@ -5,3 +5,6 @@
     REVERSE_IP=$3.$2.$1.in-addr.arpa
     /usr/local/samba/bin/samba-tool dns zonecreate $IP $REVERSE_IP --username=Administrator --password={{ admin_pass }} --workgroup={{ workgroup|upper }}
   ignore_errors: true
+
+- name: Update DNS Records
+  shell: /usr/local/samba/sbin/samba_dnsupdate --all-names --verbose

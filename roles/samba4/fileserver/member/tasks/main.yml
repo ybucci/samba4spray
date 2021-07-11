@@ -1,0 +1,12 @@
+
+- name: Set facts
+  include_tasks: "{{ playbook_dir }}/facts.yml"
+
+- name: File Server | Config
+  include_tasks: config.yml
+
+- name: Enable Samba Service and Start it
+  systemd:
+    name: samba.service
+    enabled: yes
+    state: restarted

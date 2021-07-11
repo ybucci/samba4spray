@@ -1,10 +1,12 @@
 - name: Get Syslog userid
   shell: id -u syslog
   register: id_syslog
+  when: inventory_hostname in groups['masters']
 
 - name: Add User Unix Syslog to AD
   shell: "/usr/local/samba/bin/samba-tool user add --random-password --uid-number={{ id_syslog.stdout }} syslog"
   ignore_errors: true
+  when: inventory_hostname in groups['masters']
 
 - name: Create Audit Directory
   file:
@@ -29,12 +31,19 @@
   shell: sh /tmp/acls.sh
 
 - name: Stop Samba
-  service:
+  systemd:
     name: samba.service
     state: stopped
 
 - name: Delete all files in Audit Folder
   shell: "rm -rf {{ fileserver.files_dir }}/Audit/* ; rm -rf /tmp/acls.sh"
-  notify:
-    - Restart Syslog
-    - Start Samba
+
+- name: Restart Syslog
+  systemd:
+    name: syslog.service
+    state: restarted
+
+- name: Start Samba
+  systemd:
+    name: samba.service
+    state: started    

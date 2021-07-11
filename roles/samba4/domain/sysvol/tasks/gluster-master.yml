@@ -3,7 +3,7 @@
   loop: "{{ ansible_play_hosts | flatten(levels=1) }}"
   loop_control:
     loop_var: peernode
-    pause: 2
+    pause: 5
   register: glusterpeerprobe
   become: true
   run_once: true
@@ -15,7 +15,7 @@
     state: present
     name: sysvol
     brick: /Glusterfs
-    replicas: 2
+    replicas: "{{ groups['all'] | length }}"
     cluster: "{{ groups.all | join(',') }}"
     host: "{{ inventory_hostname }}"
     force: yes

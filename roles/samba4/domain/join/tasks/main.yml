@@ -9,11 +9,10 @@
 
 - name: Samba | Configure
   include_tasks: config.yml
-  when: inventory_hostname in groups['dc']
 
 - name: Samba | Join
   include_tasks: join.yml
-  when: inventory_hostname in groups['dc']
 
 - name: Samba | Post Join
   include_tasks: post_join.yml
+  when: inventory_hostname not in groups['fileserver']

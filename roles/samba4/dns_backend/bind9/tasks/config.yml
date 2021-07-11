@@ -47,9 +47,14 @@
     state: present
     reload: yes
 
+- name: Create dir ntp_sign
+  file:
+    path: /var/lib/samba/bind-dns
+    state: directory
+    group: bind
+
 - name: Enable and start service Bind9
   systemd:
     name: bind9
     enabled: yes
     state: restarted
-  when: inventory_hostname in groups['masters']

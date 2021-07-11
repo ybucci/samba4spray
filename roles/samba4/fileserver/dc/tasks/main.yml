@@ -1,5 +1,5 @@
 - name: Set facts
-  include_tasks: ../facts.yml
+  include_tasks: "{{ playbook_dir }}/facts.yml"
   when: fileserver.dc is defined
 
 - name: File Server | Config

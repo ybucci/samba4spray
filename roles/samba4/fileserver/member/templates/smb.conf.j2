@@ -2,14 +2,18 @@
 # Do not modify!!! unless you know what you're doing
 
 [global]
-bind interfaces only = Yes
+security = ADS
+winbind refresh tickets = yes
+map acl inherit = yes
+bind interfaces only = yes
 interfaces = lo {{ target_interface }}
-netbios name = {{ inventory_hostname|upper }}
 realm = {{ samba_domain|upper }}
-server role = active directory domain controller
-server services = s3fs, rpc, nbt, wrepl, ldap, cldap, kdc, drepl, winbindd, ntp_signd, kcc, dnsupdate
 workgroup = {{ workgroup|upper }}
 idmap_ldb:use rfc2307 = yes
+idmap uid = 10000-20000
+idmap gid = 10000-20000
+idmap config * : backend = tdb
+idmap config * : range = 3000-7999
 vfs objects = dfs_samba4 acl_xattr {% if audit.enable %}full_audit {% endif %}{% if fileserver.recycle %}recycle{% endif %}
 
 acl_xattr:default acl style = windows
@@ -37,17 +41,6 @@ recycle:exclude = *.tmp, *.log, *.obj, ~*.*, *.bak
 recycle:exclude_dir = tmp, cache, profiles
 
 {% endif %}
-################# Default Shares ##################
-# Do not modify!!! unless you know what you're doing
-
-[sysvol]
-path = {% if sysvol_replication %}/Sysvol{% else %}/var/lib/samba/sysvol{% endif %}
-
-read only = No
-
-[netlogon]
-path = {% if sysvol_replication %}/Sysvol{% else %}/var/lib/samba/sysvol{% endif %}/{{ samba_domain }}/scripts
-read only = No
 
 {% if audit.enable %}
 ################# Audit ###################
