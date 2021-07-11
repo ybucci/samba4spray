@@ -37,9 +37,9 @@
   args:
     chdir: /opt/samba-{{ samba_version }}/
   when: inventory_hostname not in groups['fileserver']
-  async: 1000
-  poll: 0
-  register: config_sleeper
+  async: 180 # Maximum allowed time in Seconds
+  poll: 0 # Polling Interval in Seconds
+  register: scrout
 
 - name:  Compiling Samba FileServer | ./configure
   shell: ./configure --progress --without-ad-dc --enable-fhs --sysconfdir=/etc --localstatedir=/var --with-privatedir=/var/lib/samba/private --with-piddir=/var/run/samba --with-automount --datadir=/usr/share --with-lockdir=/var/run/samba --with-statedir=/var/lib/samba --with-cachedir=/var/cache/samba --with-systemd >> configure.log
@@ -47,16 +47,16 @@
     chdir: /opt/samba-{{ samba_version }}/
   when: inventory_hostname in groups['fileserver']
 
-- name: Compiling Samba | ./configure
+- name: Waiting Configure to Finish
   async_status:
-    jid: "{{ config_sleeper.ansible_job_id }}"
+    jid: "{{ scrout.ansible_job_id }}"
   register: job_result
   until: job_result.finished
-  retries: 1000
-  delay: 10
+  retries: 500
+  when: inventory_hostname not in groups['fileserver']
 
 - name: Compiling Samba | make
-  command: chdir=/opt/samba-{{ samba_version }}/ make -j4 make >> make.log
+  command: chdir=/opt/samba-{{ samba_version }}/ make >> make.log
   async: 1000
   poll: 0
   register: make
@@ -70,7 +70,7 @@
   delay: 10
 
 - name: Compiling Samba | make install
-  command: chdir=/opt/samba-{{ samba_version }}/ make install make >> make_install.log
+  command: chdir=/opt/samba-{{ samba_version }}/ make install >> make_install.log
   async: 1000
   poll: 0
   register: make_install
