@@ -46,6 +46,9 @@
   args:
     chdir: /opt/samba-{{ samba_version }}/
   when: inventory_hostname in groups['fileserver']
+  async: 180 # Maximum allowed time in Seconds
+  poll: 0 # Polling Interval in Seconds
+  register: scrout2
 
 - name: Waiting Configure to Finish
   async_status:
@@ -55,8 +58,18 @@
   retries: 500
   when: inventory_hostname not in groups['fileserver']
 
+- name: Waiting Configure to Finish
+  async_status:
+    jid: "{{ scrout2.ansible_job_id }}"
+  register: job_result
+  until: job_result.finished
+  retries: 500
+  when: inventory_hostname in groups['fileserver']
+
 - name: Compiling Samba | make
-  command: chdir=/opt/samba-{{ samba_version }}/ make >> make.log
+  shell: make >> make.log
+  args:
+    chdir: /opt/samba-{{ samba_version }}/  
   async: 1000
   poll: 0
   register: make
@@ -70,7 +83,9 @@
   delay: 10
 
 - name: Compiling Samba | make install
-  command: chdir=/opt/samba-{{ samba_version }}/ make install >> make_install.log
+  shell: make install >> make_install.log
+  args:
+    chdir: /opt/samba-{{ samba_version }}/  
   async: 1000
   poll: 0
   register: make_install
@@ -81,4 +96,4 @@
   register: job_result
   until: job_result.finished
   retries: 1000
-  delay: 10  
+  delay: 10
